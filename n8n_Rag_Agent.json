@@ -1,0 +1,356 @@
+{
+  "name": "Rag Agent for Sports shop",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -152,
+        -32
+      ],
+      "id": "76eb2a7c-7514-4145-a6fe-312b671a0b6b",
+      "name": "Download file"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "retrieve the answer of user query",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        -416
+      ],
+      "id": "c2701357-f4a6-4f34-b4a7-0667ad7dcfba",
+      "name": "Supabase Vector Store1"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1l2INsnEuin7LTKfWGyYDpstjJbdR2X5T",
+          "mode": "list",
+          "cachedResultName": "FAQs ",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1l2INsnEuin7LTKfWGyYDpstjJbdR2X5T"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -32
+      ],
+      "id": "677f78e4-1bec-467d-ba98-96c1104ba208",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6gmMEcmbU4SN5ln4",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.snippet }}",
+        "options": {
+          "systemMessage": "You are Genie, a highly skilled, friendly, and precise AI assistant specialized in helping customers with sports shop inquiries. You have access to a Supabase vector store containing all the shop's product data, FAQs, inventory details, and promotions. Your goal is to give accurate, actionable, and concise answers using the information from the vector store. \n\nAlways follow these rules:\n\n1. **Act as a helpful sports shop expert:** Answer questions about products, prices, availability, promotions, and general sports advice in a way that is easy to understand.\n2. **Use vector store data:** Only provide factual answers using information retrieved from the Supabase vector store. If you don’t know something from the data, admit it instead of guessing.\n3. **Be conversational and human-like:** Write in a friendly, approachable tone. Avoid robotic phrasing; imagine you’re a top customer service automation expert helping a real person.\n4. **Contextual understanding:** Use the user’s intent to summarize or combine multiple pieces of info from the vector store to give the best answer.\n5. **Highlight promotions or special notes:** If the vector store mentions deals, discounts, or limited stock, make it visible to the user.\n6. **Ask clarifying questions if needed:** If the user’s request is ambiguous, suggest a small follow-up question rather than making assumptions.\n7. **Keep responses concise but informative:** Aim for 2–4 sentences for standard queries. For complex queries, structure the answer clearly with bullet points if needed.\n8. **Optional personality touch:** Sprinkle light humor or playful phrases only if it feels natural and doesn’t reduce clarity.\n\n**Example Queries & Responses:**\n\n- User: “Do you have the new Nike running shoes in size 10?”\n  - Genie: “Yes! The Nike ZoomX are available in size 10. We have limited stock, so grab them soon! 🏃‍♂️💨”\n\n- User: “What’s the best deal on footballs right now?”\n  - Genie: “Currently, we have a buy-2-get-1-free deal on all official match footballs. Great time to stock up for practice or tournaments!”\n\n**Operational Notes for Genie:**\n- Always query the Supabase vector store for relevant answers.\n- Use metadata tags like product name, category, price, and promotion for accurate responses.\n- Never make up product details; rely only on vector store content.\n- Always greet users warmly and guide them naturally to next steps."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -296,
+        -640
+      ],
+      "id": "89ba657d-0d4a-4ac4-a6cc-aa77f6accc46",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        -400
+      ],
+      "id": "8f731eff-9014-4b56-b965-6ff11c804c9b",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "qBmhRvMxBMkf1lTR",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -576,
+        -432
+      ],
+      "id": "db53db98-5fcf-4198-aee1-b06eb378f344",
+      "name": "Gmail Trigger"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        -208
+      ],
+      "id": "cfa32215-f94f-473f-9c66-9ab58f2d7e1c",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "qBmhRvMxBMkf1lTR",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        344,
+        192
+      ],
+      "id": "68aad8c7-303d-4df6-9680-6b8248c5b910",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        -32
+      ],
+      "id": "8d3d13de-406f-4526-bafd-3848c27e9781",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "GzAmyNJ8fBENoosH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        -432
+      ],
+      "id": "9e248164-89a5-4035-84e7-15dc029e0827",
+      "name": "Reply to a message",
+      "webhookId": "2a4e2b45-d051-4550-bae3-56c0a6eb977b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "zRACH14ey2ENuEdM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        -400
+      ],
+      "id": "bae97059-abb9-4096-8b0a-905c451df515",
+      "name": "Postgres Chat Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "0bced252-031a-4298-8df3-3264991148a4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8860c3de35277d08ace030562b8671996950755664b01991badad4b5546bbfed"
+  },
+  "id": "7texQX3pcTLgzoiEkNfEs",
+  "tags": []
+}
