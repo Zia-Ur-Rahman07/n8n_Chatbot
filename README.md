@@ -1,6 +1,7 @@
 # n8n_Chatbot
 🤖 AI-powered customer service automation for sports shops using n8n, OpenAI GPT-4, and Supabase Vector Store. Automatically answers customer emails with accurate product information, promotions, and inventory details.
 An intelligent, fully automated customer service system for sports shops that uses RAG (Retrieval-Augmented Generation) to provide accurate, contextual responses to customer inquiries via email.
+
 🎯 Problem It Solves
 Sports shops receive hundreds of repetitive customer emails daily asking about:
 
